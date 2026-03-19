@@ -14,7 +14,10 @@ const CheckoutPage = () => {
   const generateOrderId = () => `BRB-${Date.now().toString(36).toUpperCase()}`;
 
   const handleWhatsAppOrder = () => {
-    if (!name || !phone || !address) return;
+    if (!name || !phone || !address) {
+      alert("Please fill all details");
+      return;
+    }
 
     const orderId = generateOrderId();
     const orderLines = items.map(i => `• ${i.name} × ${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
@@ -25,9 +28,8 @@ const CheckoutPage = () => {
       `💰 *Total: ₹${totalPrice}*\n\nThank you! 🙏`;
 
     const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/919182132773?text=${encoded}`, "_blank");
     clearCart();
-    navigate("/");
+    window.location.href = `https://wa.me/919182132773?text=${encoded}`;
   };
 
   const handleCallOrder = () => {

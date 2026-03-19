@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import HeroSection from "@/components/HeroSection";
+import StatusBanner from "@/components/StatusBanner";
 import SearchBar from "@/components/SearchBar";
 import WhyOrderHere from "@/components/WhyOrderHere";
 import MostOrdered from "@/components/MostOrdered";
@@ -16,6 +17,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <StatusBanner />
       <HeroSection onStartOrdering={scrollToMenu} />
       <SearchBar />
       <WhyOrderHere />
