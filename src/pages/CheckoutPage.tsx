@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle, Phone, Clock, ShieldCheck, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 
 const CheckoutPage = () => {
@@ -11,19 +11,27 @@ const CheckoutPage = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
+  const generateOrderId = () => `BRB-${Date.now().toString(36).toUpperCase()}`;
+
   const handleWhatsAppOrder = () => {
     if (!name || !phone || !address) return;
 
+    const orderId = generateOrderId();
     const orderLines = items.map(i => `• ${i.name} × ${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
     const message = `🍽️ *New Order - Bugle Rock Bites*\n\n` +
+      `🆔 *Order ID:* ${orderId}\n` +
       `👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n\n` +
       `🛒 *Order:*\n${orderLines}\n\n` +
       `💰 *Total: ₹${totalPrice}*\n\nThank you! 🙏`;
 
     const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    window.open(`https://wa.me/919182132773?text=${encoded}`, "_blank");
     clearCart();
     navigate("/");
+  };
+
+  const handleCallOrder = () => {
+    window.open("tel:9182132773", "_self");
   };
 
   if (items.length === 0) {
@@ -104,18 +112,52 @@ const CheckoutPage = () => {
           </div>
         </motion.div>
 
-        {/* WhatsApp button */}
-        <motion.button
-          onClick={handleWhatsAppOrder}
-          disabled={!name || !phone || !address}
-          className="w-full flex items-center justify-center gap-3 bg-whatsapp text-whatsapp-foreground py-4 rounded-2xl font-bold text-lg shadow-elevated disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.98] transition-all"
+        {/* Trust badges */}
+        <motion.div
+          className="bg-accent/50 rounded-xl p-4 space-y-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.15 }}
         >
-          <MessageCircle size={24} />
-          Order on WhatsApp
-        </motion.button>
+          <div className="flex items-center gap-2 text-sm text-accent-foreground">
+            <ShieldCheck size={16} />
+            <span>📞 We will confirm your order via call</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-accent-foreground">
+            <Clock size={16} />
+            <span>⏱️ Preparation time: 15–20 mins</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-accent-foreground">
+            <Wallet size={16} />
+            <span>💰 Pay at hotel / pickup</span>
+          </div>
+        </motion.div>
+
+        {/* Order buttons */}
+        <div className="space-y-3">
+          <motion.button
+            onClick={handleWhatsAppOrder}
+            disabled={!name || !phone || !address}
+            className="w-full flex items-center justify-center gap-3 bg-whatsapp text-whatsapp-foreground py-4 rounded-2xl font-bold text-lg shadow-elevated disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.98] transition-all"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <MessageCircle size={24} />
+            📲 Order on WhatsApp
+          </motion.button>
+
+          <motion.button
+            onClick={handleCallOrder}
+            className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 rounded-2xl font-bold text-lg shadow-elevated hover:brightness-110 active:scale-[0.98] transition-all"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <Phone size={24} />
+            📞 Call to Order
+          </motion.button>
+        </div>
       </div>
     </div>
   );
