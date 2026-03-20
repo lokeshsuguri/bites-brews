@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MessageCircle, Phone, Clock, ShieldCheck, Wallet } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowLeft, MessageCircle, Phone, Clock, ShieldCheck, Wallet, PartyPopper, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -10,33 +10,42 @@ const CheckoutPage = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [orderId, setOrderId] = useState("");
 
   const generateOrderId = () => `BRB-${Date.now().toString(36).toUpperCase()}`;
 
-  const handleWhatsAppOrder = () => {
-    if (!name || !phone || !address) {
+  const handlePlaceOrder = () => {
+    if (!name.trim() || !phone.trim() || !address.trim()) {
       alert("Please fill all details");
       return;
     }
+    const id = generateOrderId();
+    setOrderId(id);
+    setShowConfirmation(true);
+  };
 
-    const orderId = generateOrderId();
+  const getWhatsAppUrl = () => {
     const orderLines = items.map(i => `• ${i.name} × ${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
     const message = `🍽️ *New Order - Bugle Rock Bites*\n\n` +
       `🆔 *Order ID:* ${orderId}\n` +
       `👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n\n` +
       `🛒 *Order:*\n${orderLines}\n\n` +
       `💰 *Total: ₹${totalPrice}*\n\nThank you! 🙏`;
+    return `https://wa.me/919182132773?text=${encodeURIComponent(message)}`;
+  };
 
-    const encoded = encodeURIComponent(message);
+  const handleSendToRestaurant = () => {
+    const url = getWhatsAppUrl();
     clearCart();
-    window.location.href = `https://wa.me/919182132773?text=${encoded}`;
+    window.location.href = url;
   };
 
   const handleCallOrder = () => {
     window.location.href = "tel:9182132773";
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !showConfirmation) {
     navigate("/");
     return null;
   }
@@ -122,29 +131,76 @@ const CheckoutPage = () => {
         {/* Order buttons */}
         <div className="space-y-3 pb-6">
           <motion.button
-            onClick={handleWhatsAppOrder}
+            onClick={handlePlaceOrder}
             disabled={!isFormValid}
-            className="w-full flex items-center justify-center gap-3 bg-whatsapp text-whatsapp-foreground py-4.5 rounded-2xl font-bold text-lg shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.98] transition-all"
+            className="w-full flex items-center justify-center gap-3 gradient-hero text-primary-foreground py-4.5 rounded-2xl font-bold text-lg shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.98] transition-all"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <MessageCircle size={24} />
-            Order on WhatsApp
+            Place Order 🚀
           </motion.button>
 
           <motion.button
             onClick={handleCallOrder}
-            className="w-full flex items-center justify-center gap-3 gradient-hero text-primary-foreground py-4.5 rounded-2xl font-bold text-lg shadow-elevated hover:brightness-110 active:scale-[0.98] transition-all"
+            className="w-full flex items-center justify-center gap-3 bg-card border-2 border-primary text-primary py-4 rounded-2xl font-bold text-lg hover:bg-primary/5 active:scale-[0.98] transition-all"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
           >
-            <Phone size={24} />
+            <Phone size={22} />
             Call to Order
           </motion.button>
         </div>
       </div>
+
+      {/* Confirmation Popup */}
+      <AnimatePresence>
+        {showConfirmation && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/60 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-card rounded-3xl shadow-elevated p-8 max-w-sm w-full text-center space-y-5"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <div className="w-20 h-20 rounded-full bg-success/15 flex items-center justify-center mx-auto">
+                <PartyPopper size={40} className="text-success" />
+              </div>
+              <h2 className="text-2xl font-extrabold text-card-foreground font-display">
+                🎉 Order Confirmed!
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Order ID: <span className="font-bold text-foreground">{orderId}</span>
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Send this order to the restaurant via WhatsApp to complete it.
+              </p>
+
+              <button
+                onClick={handleSendToRestaurant}
+                className="w-full flex items-center justify-center gap-3 bg-whatsapp text-whatsapp-foreground py-4 rounded-2xl font-bold text-lg shadow-elevated hover:brightness-110 active:scale-[0.98] transition-all"
+              >
+                <Send size={22} />
+                Send Order to Restaurant
+              </button>
+
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="text-muted-foreground text-sm underline hover:text-foreground transition-colors"
+              >
+                Go back & edit
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
