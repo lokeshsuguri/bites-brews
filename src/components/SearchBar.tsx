@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
 
   const results = query.trim()
     ? menuItems.filter(item =>
@@ -19,20 +18,18 @@ const SearchBar = () => {
   return (
     <div className="px-4 py-3">
       <div className="relative">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         <input
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder="Search for dishes..."
-          className="w-full pl-11 pr-10 py-3 rounded-2xl border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring shadow-soft transition text-sm"
+          className="w-full pl-11 pr-10 py-3.5 rounded-2xl border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent shadow-soft transition text-sm font-medium"
         />
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-accent transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-accent transition-colors"
           >
             <X size={16} className="text-muted-foreground" />
           </button>
@@ -49,7 +46,7 @@ const SearchBar = () => {
           >
             {results.length > 0 ? (
               <>
-                <p className="text-xs text-muted-foreground px-1">
+                <p className="text-xs text-muted-foreground font-medium px-1">
                   {results.length} result{results.length > 1 ? "s" : ""} found
                 </p>
                 {results.map(item => (
@@ -57,9 +54,12 @@ const SearchBar = () => {
                 ))}
               </>
             ) : (
-              <p className="text-center text-muted-foreground text-sm py-6">
-                No dishes found for "{query}"
-              </p>
+              <div className="text-center py-8">
+                <span className="text-3xl block mb-2">🍽️</span>
+                <p className="text-muted-foreground text-sm font-medium">
+                  No dishes found for "{query}"
+                </p>
+              </div>
             )}
           </motion.div>
         )}

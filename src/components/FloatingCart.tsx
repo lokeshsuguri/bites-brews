@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ChevronRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ const FloatingCart = () => {
     <AnimatePresence>
       {totalItems > 0 && (
         <motion.div
-          className="fixed bottom-0 left-0 right-0 z-50 p-3"
+          className="fixed bottom-0 left-0 right-0 z-50 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
           initial={{ y: 100 }}
           animate={{ y: 0 }}
           exit={{ y: 100 }}
@@ -19,22 +19,22 @@ const FloatingCart = () => {
         >
           <button
             onClick={() => navigate("/cart")}
-            className="w-full max-w-lg mx-auto flex items-center justify-between gradient-hero text-primary-foreground px-5 py-4 rounded-2xl shadow-glow"
+            className="w-full max-w-lg mx-auto flex items-center justify-between gradient-hero text-primary-foreground px-5 py-4 rounded-2xl shadow-glow active:scale-[0.98] transition-transform"
           >
             <div className="flex items-center gap-3">
               <div className="relative">
                 <ShoppingCart size={22} />
-                <span className="absolute -top-2 -right-2 bg-card text-primary text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-2.5 -right-2.5 bg-card text-primary text-xs font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-soft">
                   {totalItems}
                 </span>
               </div>
-              <span className="font-semibold">
-                {totalItems} item{totalItems > 1 ? "s" : ""}
+              <span className="font-semibold text-sm">
+                {totalItems} item{totalItems > 1 ? "s" : ""} added
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span className="font-bold text-lg">₹{totalPrice}</span>
-              <span className="text-sm opacity-90">View Cart →</span>
+              <ChevronRight size={18} className="opacity-80" />
             </div>
           </button>
         </motion.div>
