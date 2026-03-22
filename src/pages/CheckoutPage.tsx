@@ -29,11 +29,12 @@ const CheckoutPage = () => {
 
   const getWhatsAppUrl = () => {
     const orderLines = items.map(i => `• ${i.name} × ${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
+    const payLabel = paymentMethod === "upi" ? "💳 UPI (Online)" : "💰 Pay at Hotel";
     const message = `🍽️ *New Order - Bugle Rock Bites*\n\n` +
       `🆔 *Order ID:* ${orderId}\n` +
       `👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n\n` +
       `🛒 *Order:*\n${orderLines}\n\n` +
-      `💰 *Total: ₹${totalPrice}*\n\nThank you! 🙏`;
+      `💰 *Total: ₹${totalPrice}*\n${payLabel}\n\nThank you! 🙏`;
     return `https://wa.me/919182132773?text=${encodeURIComponent(message)}`;
   };
 
