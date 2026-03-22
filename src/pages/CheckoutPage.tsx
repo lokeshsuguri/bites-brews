@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MessageCircle, Phone, Clock, ShieldCheck, Wallet, PartyPopper, Send } from "lucide-react";
+import { ArrowLeft, Phone, Clock, ShieldCheck, Wallet, PartyPopper, Send, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import UpiPayment from "@/components/UpiPayment";
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCart();
