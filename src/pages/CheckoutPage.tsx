@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MessageCircle, Phone, Clock, ShieldCheck, Wallet, PartyPopper, Send } from "lucide-react";
+import { ArrowLeft, Phone, Clock, ShieldCheck, Wallet, PartyPopper, Send, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import UpiPayment from "@/components/UpiPayment";
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -12,6 +13,7 @@ const CheckoutPage = () => {
   const [address, setAddress] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [orderId, setOrderId] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"hotel" | "upi">("hotel");
 
   const generateOrderId = () => `BRB-${Date.now().toString(36).toUpperCase()}`;
 
@@ -27,11 +29,12 @@ const CheckoutPage = () => {
 
   const getWhatsAppUrl = () => {
     const orderLines = items.map(i => `• ${i.name} × ${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
+    const payLabel = paymentMethod === "upi" ? "💳 UPI (Online)" : "💰 Pay at Hotel";
     const message = `🍽️ *New Order - Bugle Rock Bites*\n\n` +
       `🆔 *Order ID:* ${orderId}\n` +
       `👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n\n` +
       `🛒 *Order:*\n${orderLines}\n\n` +
-      `💰 *Total: ₹${totalPrice}*\n\nThank you! 🙏`;
+      `💰 *Total: ₹${totalPrice}*\n${payLabel}\n\nThank you! 🙏`;
     return `https://wa.me/919182132773?text=${encodeURIComponent(message)}`;
   };
 
@@ -119,7 +122,7 @@ const CheckoutPage = () => {
           {[
             { icon: ShieldCheck, text: "We will confirm your order via call" },
             { icon: Clock, text: "Preparation time: 15–20 mins" },
-            { icon: Wallet, text: "Pay at hotel / pickup" },
+            { icon: Wallet, text: "Pay at hotel / pickup / UPI" },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-3 text-sm text-accent-foreground font-medium">
               <Icon size={18} className="text-primary flex-shrink-0" />
@@ -127,6 +130,54 @@ const CheckoutPage = () => {
             </div>
           ))}
         </motion.div>
+
+        {/* Payment Method */}
+        <motion.div
+          className="bg-card rounded-2xl shadow-card p-5 space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.17 }}
+        >
+          <h3 className="font-bold text-card-foreground font-display">Payment Method</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setPaymentMethod("hotel")}
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-95 ${
+                paymentMethod === "hotel"
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/40"
+              }`}
+            >
+              <Wallet size={24} />
+              <span className="text-sm font-semibold">Pay at Hotel</span>
+            </button>
+            <button
+              onClick={() => setPaymentMethod("upi")}
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-95 ${
+                paymentMethod === "upi"
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/40"
+              }`}
+            >
+              <Smartphone size={24} />
+              <span className="text-sm font-semibold">Pay via UPI</span>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* UPI QR Section */}
+        <AnimatePresence>
+          {paymentMethod === "upi" && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <UpiPayment amount={totalPrice} orderId={orderId || "pending"} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Order buttons */}
         <div className="space-y-3 pb-6">
