@@ -13,6 +13,7 @@ const CheckoutPage = () => {
   const [address, setAddress] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [orderId, setOrderId] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"hotel" | "upi">("hotel");
 
   const generateOrderId = () => `BRB-${Date.now().toString(36).toUpperCase()}`;
 
